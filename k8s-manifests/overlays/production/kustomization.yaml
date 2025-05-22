@@ -5,10 +5,10 @@ resources:
 - ../../base
 
 images:
-- name: ${BACKEND_IMAGE}
+- name: cloud-cost-optimizer-backend:latest
   newName: your-registry/cloud-cost-optimizer-backend
   newTag: latest
-- name: ${FRONTEND_IMAGE}
+- name: cloud-cost-optimizer-frontend:latest
   newName: your-registry/cloud-cost-optimizer-frontend
   newTag: latest
 

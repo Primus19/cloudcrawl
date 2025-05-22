@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ${FRONTEND_IMAGE}
+        image: cloud-cost-optimizer-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

@@ -21,7 +21,7 @@ spec:
       serviceAccountName: cloud-cost-optimizer-sa
       containers:
       - name: backend
-        image: ${BACKEND_IMAGE}
+        image: cloud-cost-optimizer-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
