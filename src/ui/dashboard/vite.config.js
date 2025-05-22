@@ -14,11 +14,19 @@ module.exports = defineConfig({
     outDir: 'build',
     sourcemap: true,
     rollupOptions: {
+<<<<<<< HEAD
       external: ['@mui/x-data-grid'],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           mui: ['@mui/material', '@mui/icons-material']
+=======
+      external: [],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          mui: ['@mui/material', '@mui/icons-material', '@mui/x-data-grid']
+>>>>>>> 30402d48bafbc7664fafa92efffb15ad12e4e8fd
         }
       }
     }

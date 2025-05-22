@@ -8,8 +8,12 @@ resources:
 - configmap.yaml
 - secrets.yaml
 - storage-class.yaml
+<<<<<<< HEAD
 - terraform-state-pv.yaml
 - database-pv.yaml
+=======
+- persistent-volumes.yaml
+>>>>>>> 30402d48bafbc7664fafa92efffb15ad12e4e8fd
 - persistent-volume-claims.yaml
 - backend-deployment.yaml
 - backend-service.yaml

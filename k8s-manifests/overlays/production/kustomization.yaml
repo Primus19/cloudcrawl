@@ -4,10 +4,10 @@ kind: Kustomization
 resources:
 - ../../base
 
-# Using replace behavior for the ConfigMap to ensure it overrides the base one
+# Using create instead of replace for the ConfigMap
 configMapGenerator:
 - name: cloud-cost-optimizer-config
-  behavior: replace
+  behavior: merge
   literals:
   - ENVIRONMENT=production
   - LOG_LEVEL=info

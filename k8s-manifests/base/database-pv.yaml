@@ -2,15 +2,22 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: database-pv
+<<<<<<< HEAD
   namespace: cloud-cost-optimizer
 spec:
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
+=======
+spec:
+  capacity:
+    storage: 1Gi
+>>>>>>> 30402d48bafbc7664fafa92efffb15ad12e4e8fd
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
+<<<<<<< HEAD
   local:
     path: /mnt/data/database
   nodeAffinity:
@@ -19,3 +26,8 @@ spec:
       - matchExpressions:
         - key: kubernetes.io/hostname
           operator: Exists
+=======
+  hostPath:
+    path: /mnt/data/database
+    type: DirectoryOrCreate
+>>>>>>> 30402d48bafbc7664fafa92efffb15ad12e4e8fd
