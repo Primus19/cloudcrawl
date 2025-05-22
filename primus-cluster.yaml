@@ -1,0 +1,23 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: PrimusAllCluster
+  region: us-east-1  # Change to your preferred AWS region
+  version: "1.29"
+
+iam:
+  withOIDC: true  # Enables IAM roles for service accounts
+
+managedNodeGroups:
+  - name: primary-nodes
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    volumeSize: 20
+    # No SSH access setup here
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-cost-optimizer-backend
+  namespace: cloud-cost-optimizer
+  labels:
+    app: cloud-cost-optimizer
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-cost-optimizer
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: cloud-cost-optimizer
+        tier: backend
+    spec:
+      serviceAccountName: cloud-cost-optimizer-sa
+      containers:
+      - name: backend
+        image: ${BACKEND_IMAGE}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: AWS_SHARED_CREDENTIALS_FILE
+          value: /etc/cloud-credentials/aws-credentials
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/cloud-credentials/gcp-credentials.json
+        - name: AZURE_AUTH_LOCATION
+          value: /etc/cloud-credentials/azure-credentials.json
+        - name: TERRAFORM_STATE_DIR
+          value: /terraform/state
+        - name: TERRAFORM_TEMPLATES_DIR
+          value: /terraform/templates
+        volumeMounts:
+        - name: cloud-credentials
+          mountPath: /etc/cloud-credentials
+          readOnly: true
+        - name: terraform-state
+          mountPath: /terraform
+        - name: config-volume
+          mountPath: /app/config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: cloud-credentials
+        secret:
+          secretName: cloud-credentials
+      - name: terraform-state
+        persistentVolumeClaim:
+          claimName: terraform-state-pvc
+      - name: config-volume
+        configMap:
+          name: cloud-cost-optimizer-config
