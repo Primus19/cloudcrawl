@@ -11,8 +11,9 @@ RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
     terraform-local python-terraform pyyaml requests \
     pytest pytest-cov flake8 black
 
-# Copy application code
-COPY ./src /app/src
+# Copy application code to the root directory
+# This ensures imports like 'from src.api' work correctly
+COPY . /app
 
 # Set environment variables
 ENV FLASK_APP=/app/src/main.py
