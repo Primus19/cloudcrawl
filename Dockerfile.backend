@@ -5,8 +5,9 @@ WORKDIR /app
 # Install compatible versions of Flask and Werkzeug
 RUN pip install flask==2.0.1 werkzeug==2.0.3
 
-# Install other dependencies
-RUN pip install boto3 google-cloud-storage azure-storage-blob \
+# Install Flask extensions and other dependencies
+RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
+    boto3 google-cloud-storage azure-storage-blob \
     terraform-local python-terraform pyyaml requests \
     pytest pytest-cov flake8 black
 
