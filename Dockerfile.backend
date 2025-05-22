@@ -11,9 +11,29 @@ RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
     terraform-local python-terraform pyyaml requests \
     pytest pytest-cov flake8 black
 
-# Copy only the src directory from the build context
-# This assumes the Dockerfile is placed at the repository root
+# Copy the src directory to /app/src
 COPY src /app/src
+
+# Create __init__.py files to make directories into packages
+RUN touch /app/src/__init__.py
+RUN mkdir -p /app/src/api && touch /app/src/api/__init__.py
+
+# Create a wrapper script to handle imports correctly
+RUN echo '#!/usr/bin/env python3\n\
+import os\n\
+import sys\n\
+\n\
+# Add the current directory to Python path\n\
+sys.path.insert(0, os.path.abspath("."))\n\
+\n\
+# Import and run the application\n\
+from src.main import create_app\n\
+\n\
+if __name__ == "__main__":\n\
+    app = create_app()\n\
+    app.run(host="0.0.0.0", port=5000)\n\
+' > /app/run.py
+RUN chmod +x /app/run.py
 
 # Set environment variables
 ENV FLASK_APP=/app/src/main.py
@@ -23,5 +43,5 @@ ENV PYTHONPATH=/app
 # Expose the port
 EXPOSE 5000
 
-# Run the application
-CMD ["python", "/app/src/main.py"]
+# Run the application using the wrapper script
+CMD ["python", "/app/run.py"]
