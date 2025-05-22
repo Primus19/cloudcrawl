@@ -11,9 +11,11 @@ RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
     terraform-local python-terraform pyyaml requests \
     pytest pytest-cov flake8 black
 
-# Copy application code to the root directory
-# This ensures imports like 'from src.api' work correctly
+# Copy application code
 COPY . /app
+
+# Create a fix_imports.py file
+RUN echo 'import os, sys; sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))' > /app/fix_imports.py
 
 # Set environment variables
 ENV FLASK_APP=/app/src/main.py
@@ -23,5 +25,5 @@ ENV PYTHONPATH=/app
 # Expose the port
 EXPOSE 5000
 
-# Run the application
-CMD ["python", "/app/src/main.py"]
+# Run the application with the import fix
+CMD ["python", "-c", "import fix_imports; import src.main"]
