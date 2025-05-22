@@ -30,7 +30,8 @@ import {
   Menu as MenuIcon,
   Person as PersonIcon,
   Notifications as NotificationsIcon,
-  Help as HelpIcon
+  Help as HelpIcon,
+  Cloud as CloudIcon
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -43,6 +44,7 @@ const menuItems = [
   { text: 'Actions', icon: <ActionsIcon />, path: '/actions' },
   { text: 'Workflows', icon: <WorkflowsIcon />, path: '/workflows' },
   { text: 'Terraform', icon: <TerraformIcon />, path: '/terraform' },
+  { text: 'Cloud Accounts', icon: <CloudIcon />, path: '/cloud-accounts' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 

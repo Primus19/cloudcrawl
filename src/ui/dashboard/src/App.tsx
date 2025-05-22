@@ -15,6 +15,7 @@ import Actions from './components/pages/Actions';
 import Workflows from './components/pages/Workflows';
 import Terraform from './components/pages/Terraform';
 import Settings from './components/pages/Settings';
+import CloudAccounts from './components/pages/CloudAccounts';
 import NotFound from './components/pages/NotFound';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="actions" element={<Actions />} />
             <Route path="workflows" element={<Workflows />} />
             <Route path="terraform" element={<Terraform />} />
+            <Route path="cloud-accounts" element={<CloudAccounts />} />
             <Route path="settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Route>
