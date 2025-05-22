@@ -21,7 +21,7 @@ spec:
       serviceAccountName: cloud-cost-optimizer-sa
       containers:
       - name: backend
-        image: cloud-cost-optimizer-backend:latest
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000

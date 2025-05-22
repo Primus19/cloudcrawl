@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: cloud-cost-optimizer-frontend:latest
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

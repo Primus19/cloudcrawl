@@ -4,13 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 
-images:
-- name: cloud-cost-optimizer-backend:latest
-  newName: your-registry/cloud-cost-optimizer-backend
-  newTag: latest
-- name: cloud-cost-optimizer-frontend:latest
-  newName: your-registry/cloud-cost-optimizer-frontend
-  newTag: latest
+# No images block needed since we're using fully qualified ECR image names directly in the base manifests
 
 # Using create instead of merge since the ConfigMap already exists in base
 configMapGenerator:
