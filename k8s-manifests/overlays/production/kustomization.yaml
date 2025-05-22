@@ -4,12 +4,10 @@ kind: Kustomization
 resources:
 - ../../base
 
-# No images block needed since we're using fully qualified ECR image names directly in the base manifests
-
-# Using create instead of merge since the ConfigMap already exists in base
+# Using create instead of merge for the production-specific ConfigMap
 configMapGenerator:
-- name: cloud-cost-optimizer-config-overlay
-  behavior: create
+- name: cloud-cost-optimizer-config
+  behavior: replace
   literals:
   - ENVIRONMENT=production
   - LOG_LEVEL=info
