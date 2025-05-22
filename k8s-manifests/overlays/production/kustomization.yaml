@@ -11,3 +11,9 @@ configMapGenerator:
   literals:
   - ENVIRONMENT=production
   - LOG_LEVEL=info
+
+# Explicitly set the backend image to prevent variable substitution
+images:
+- name: ${BACKEND_IMAGE}
+  newName: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend
+  newTag: latest
