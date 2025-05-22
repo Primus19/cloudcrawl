@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: database-new
+  name: terraform-state-new
   namespace: cloud-cost-optimizer
 spec:
   accessModes:
@@ -9,4 +9,4 @@ spec:
   storageClassName: ebs-sc
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi

@@ -70,7 +70,7 @@ spec:
           secretName: cloud-credentials
       - name: terraform-state
         persistentVolumeClaim:
-          claimName: terraform-state-pvc
+          claimName: terraform-state-new
       - name: config-volume
         configMap:
           name: cloud-cost-optimizer-config

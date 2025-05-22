@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
 - storage-class-ebs.yaml
-- terraform-state-pvc.yaml
-- database-pvc.yaml
+- terraform-state-new-pvc.yaml
+- database-new-pvc.yaml
+- backend-deployment-updated.yaml
 
 namespace: cloud-cost-optimizer
