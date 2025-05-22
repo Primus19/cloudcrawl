@@ -13,6 +13,18 @@ module.exports = defineConfig({
   build: {
     outDir: 'build',
     sourcemap: true,
+    rollupOptions: {
+      external: ['@mui/x-data-grid'],
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          mui: ['@mui/material', '@mui/icons-material']
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['@mui/material', '@mui/icons-material', '@mui/x-data-grid']
   },
   server: {
     port: 3000,

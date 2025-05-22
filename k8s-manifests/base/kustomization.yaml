@@ -7,6 +7,9 @@ resources:
 - rbac.yaml
 - configmap.yaml
 - secrets.yaml
+- storage-class.yaml
+- terraform-state-pv.yaml
+- database-pv.yaml
 - persistent-volume-claims.yaml
 - backend-deployment.yaml
 - backend-service.yaml

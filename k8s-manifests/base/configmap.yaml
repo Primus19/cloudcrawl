@@ -3,16 +3,6 @@ kind: ConfigMap
 metadata:
   name: cloud-cost-optimizer-config
   namespace: cloud-cost-optimizer
-  labels:
-    app: cloud-cost-optimizer
 data:
-  config.json: |
-    {
-      "logLevel": "info",
-      "refreshInterval": 3600,
-      "features": {
-        "recommendations": true,
-        "actions": true,
-        "terraform": true
-      }
-    }
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "info"
