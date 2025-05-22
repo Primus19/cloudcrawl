@@ -14,8 +14,44 @@ RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
 # Copy application code
 COPY . /app
 
-# Create a fix_imports.py file
-RUN echo 'import os, sys; sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))' > /app/fix_imports.py
+# Create an entrypoint script with verbose debugging
+RUN echo '#!/bin/bash\n\
+echo "=== STARTING APPLICATION WITH VERBOSE DEBUGGING ==="\n\
+echo "Current directory: $(pwd)"\n\
+echo "Directory contents:"\n\
+ls -la\n\
+echo ""\n\
+echo "Python version:"\n\
+python --version\n\
+echo ""\n\
+echo "Environment variables:"\n\
+env | sort\n\
+echo ""\n\
+echo "Python path:"\n\
+python -c "import sys; print(sys.path)"\n\
+echo ""\n\
+echo "Checking for src directory:"\n\
+if [ -d "/app/src" ]; then\n\
+  echo "src directory exists"\n\
+  echo "src directory contents:"\n\
+  ls -la /app/src\n\
+else\n\
+  echo "ERROR: src directory does not exist!"\n\
+fi\n\
+echo ""\n\
+echo "Checking for main.py:"\n\
+if [ -f "/app/src/main.py" ]; then\n\
+  echo "main.py exists"\n\
+  echo "main.py contents (first 20 lines):"\n\
+  head -n 20 /app/src/main.py\n\
+else\n\
+  echo "ERROR: main.py does not exist!"\n\
+fi\n\
+echo ""\n\
+echo "Attempting to run application..."\n\
+export PYTHONPATH=/app\n\
+python -c "import sys; sys.path.insert(0, \"/app\"); print(\"Updated Python path:\", sys.path); print(\"Attempting to import main module...\"); try: from src.main import create_app; print(\"Successfully imported create_app\"); app = create_app(); print(\"Successfully created app\"); app.run(host=\"0.0.0.0\", port=5000); except Exception as e: print(f\"ERROR: {type(e).__name__}: {str(e)}\"); import traceback; traceback.print_exc()"\n\
+' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 # Set environment variables
 ENV FLASK_APP=/app/src/main.py
@@ -25,5 +61,5 @@ ENV PYTHONPATH=/app
 # Expose the port
 EXPOSE 5000
 
-# Run the application with the import fix
-CMD ["python", "-c", "import fix_imports; import src.main"]
+# Run the entrypoint script
+CMD ["/bin/bash", "/app/entrypoint.sh"]
