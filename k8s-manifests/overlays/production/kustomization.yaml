@@ -12,9 +12,10 @@ images:
   newName: your-registry/cloud-cost-optimizer-frontend
   newTag: latest
 
+# Using create instead of merge since the ConfigMap already exists in base
 configMapGenerator:
-- name: cloud-cost-optimizer-config
-  behavior: merge
+- name: cloud-cost-optimizer-config-overlay
+  behavior: create
   literals:
   - ENVIRONMENT=production
   - LOG_LEVEL=info
