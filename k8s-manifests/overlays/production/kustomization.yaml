@@ -4,36 +4,17 @@ kind: Kustomization
 resources:
 - ../../base
 
+images:
+- name: ${BACKEND_IMAGE}
+  newName: your-registry/cloud-cost-optimizer-backend
+  newTag: latest
+- name: ${FRONTEND_IMAGE}
+  newName: your-registry/cloud-cost-optimizer-frontend
+  newTag: latest
+
 configMapGenerator:
-- name: kustomization-config
-  behavior: create
+- name: cloud-cost-optimizer-config
+  behavior: merge
   literals:
-  - BACKEND_IMAGE=your-registry/cloud-cost-optimizer-backend:latest
-  - FRONTEND_IMAGE=your-registry/cloud-cost-optimizer-frontend:latest
-
-replacements:
-- source:
-    kind: ConfigMap
-    name: kustomization-config
-    fieldPath: data.BACKEND_IMAGE
-  targets:
-  - select:
-      kind: Deployment
-      name: cloud-cost-optimizer-backend
-    fieldPaths:
-    - spec.template.spec.containers.[name=backend].image
-    options:
-      create: true
-
-- source:
-    kind: ConfigMap
-    name: kustomization-config
-    fieldPath: data.FRONTEND_IMAGE
-  targets:
-  - select:
-      kind: Deployment
-      name: cloud-cost-optimizer-frontend
-    fieldPaths:
-    - spec.template.spec.containers.[name=frontend].image
-    options:
-      create: true
+  - ENVIRONMENT=production
+  - LOG_LEVEL=info
