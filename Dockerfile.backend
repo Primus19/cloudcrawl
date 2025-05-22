@@ -20,12 +20,15 @@ RUN touch /app/src/__init__.py
 # Create necessary API modules
 RUN mkdir -p /app/src/api && \
     touch /app/src/api/__init__.py && \
-    echo 'from flask import Blueprint\n\naccounts_bp = Blueprint("accounts", __name__)\n\n@accounts_bp.route("/api/v1/accounts")\ndef list_accounts():\n    return {"accounts": []}\n\n@accounts_bp.route("/api/v1/health")\ndef health_check():\n    return {"status": "ok"}' > /app/src/api/accounts.py && \
+    echo 'from flask import Blueprint\n\naccounts_bp = Blueprint("accounts", __name__)\n\n@accounts_bp.route("/api/v1/accounts")\ndef list_accounts():\n    return {"accounts": []}' > /app/src/api/accounts.py && \
     echo 'from flask import Blueprint\n\nresources_bp = Blueprint("resources", __name__)\n\n@resources_bp.route("/api/v1/resources")\ndef list_resources():\n    return {"resources": []}' > /app/src/api/resources.py && \
     echo 'from flask import Blueprint\n\ncosts_bp = Blueprint("costs", __name__)\n\n@costs_bp.route("/api/v1/costs")\ndef get_costs():\n    return {"costs": []}' > /app/src/api/costs.py && \
     echo 'from flask import Blueprint\n\nrecommendations_bp = Blueprint("recommendations", __name__)\n\n@recommendations_bp.route("/api/v1/recommendations")\ndef get_recommendations():\n    return {"recommendations": []}' > /app/src/api/recommendations.py && \
     echo 'from flask import Blueprint\n\nactions_bp = Blueprint("actions", __name__)\n\n@actions_bp.route("/api/v1/actions")\ndef list_actions():\n    return {"actions": []}' > /app/src/api/actions.py && \
     echo 'from flask import Blueprint\n\nworkflows_bp = Blueprint("workflows", __name__)\n\n@workflows_bp.route("/api/v1/workflows")\ndef list_workflows():\n    return {"workflows": []}' > /app/src/api/workflows.py
+
+# Create health endpoint as a separate module
+RUN echo 'from flask import Blueprint\n\nhealth_bp = Blueprint("health", __name__)\n\n@health_bp.route("/api/v1/health")\ndef health_check():\n    return {"status": "ok"}' > /app/src/api/health.py
 
 # Create terraform API module
 RUN mkdir -p /app/src/terraform && \
@@ -34,8 +37,9 @@ RUN mkdir -p /app/src/terraform && \
     touch /app/src/terraform/api/__init__.py && \
     echo 'from flask import Blueprint\n\nterraform_bp = Blueprint("terraform", __name__)\n\n@terraform_bp.route("/api/v1/terraform/status")\ndef get_status():\n    return {"status": "ok"}' > /app/src/terraform/api/__init__.py
 
-# Add a health endpoint directly to main.py
-RUN sed -i '/app = Flask/a \\\n    @app.route("/api/v1/health")\n    def health():\n        return {"status": "ok"}' /app/src/main.py
+# Create a custom main.py wrapper that includes the health endpoint
+RUN echo 'import os\nimport sys\nfrom flask import Flask, jsonify, send_from_directory\nfrom flask_cors import CORS\n\n# Add the project root directory to the Python path\nsys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n\ndef create_app():\n    """Create and configure the Flask application."""\n    app = Flask(__name__, static_folder="ui/dashboard/build", static_url_path="")\n    CORS(app)  # Enable CORS for all routes\n    \n    # Register API blueprints\n    from src.api.accounts import accounts_bp\n    from src.api.resources import resources_bp\n    from src.api.costs import costs_bp\n    from src.api.recommendations import recommendations_bp\n    from src.api.actions import actions_bp\n    from src.api.workflows import workflows_bp\n    from src.terraform.api import terraform_bp\n    from src.api.health import health_bp\n    \n    app.register_blueprint(accounts_bp)\n    app.register_blueprint(resources_bp)\n    app.register_blueprint(costs_bp)\n    app.register_blueprint(recommendations_bp)\n    app.register_blueprint(actions_bp)\n    app.register_blueprint(workflows_bp)\n    app.register_blueprint(terraform_bp)\n    app.register_blueprint(health_bp)\n    \n    # Direct health endpoint on the app\n    @app.route("/api/v1/health")\n    def health():\n        return jsonify({"status": "ok"})\n    \n    # Serve React app\n    @app.route("/", defaults={"path": ""})\n    @app.route("/<path:path>")\n    def serve(path):\n        if path and os.path.exists(os.path.join(app.static_folder, path)):\n            return send_from_directory(app.static_folder, path)\n        return send_from_directory(app.static_folder, "index.html")\n    \n    # Error handlers\n    @app.errorhandler(404)\n    def not_found(e):\n        return jsonify({\n            "success": False,\n            "error": "Not found",\n            "message": "The requested resource was not found"\n        }), 404\n    \n    @app.errorhandler(500)\n    def server_error(e):\n        return jsonify({\n            "success": False,\n            "error": "Internal server error",\n            "message": "An unexpected error occurred"\n        }), 500\n    \n    return app\n\nif __name__ == "__main__":\n    app = create_app()\n    port = int(os.environ.get("PORT", 5000))\n    app.run(host="0.0.0.0", port=port, debug=True)\n' > /app/src/main.py.new && \
+    mv /app/src/main.py.new /app/src/main.py
 
 # Create a wrapper script to handle imports correctly
 RUN echo '#!/usr/bin/env python3\nimport os\nimport sys\n\n# Add the current directory to Python path\nsys.path.insert(0, os.path.abspath("."))\n\n# Import and run the application\nfrom src.main import create_app\n\nif __name__ == "__main__":\n    app = create_app()\n    app.run(host="0.0.0.0", port=5000)\n' > /app/run.py && \
