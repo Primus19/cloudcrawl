@@ -41,6 +41,26 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+    
+    - name: Prepare nginx configuration
+      run: |
+        cat > nginx.conf << 'EOF'
+        server {
+            listen 80;
+            
+            location / {
+                root /usr/share/nginx/html;
+                index index.html;
+                try_files $uri $uri/ /index.html;
+            }
+            
+            location /api {
+                proxy_pass http://cloud-cost-optimizer-backend:5000;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+            }
+        }
+        EOF
       
     - name: Build and push backend image
       uses: docker/build-push-action@v4
@@ -53,8 +73,8 @@ jobs:
     - name: Build and push frontend image
       uses: docker/build-push-action@v4
       with:
-        context: ./src/ui/dashboard
-        file: ./src/ui/dashboard/Dockerfile.frontend
+        context: .
+        file: ./Dockerfile.frontend
         push: true
         tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_ECR_REPOSITORY }}:${{ github.sha }},${{ steps.login-ecr.outputs.registry }}/${{ env.FRONTEND_ECR_REPOSITORY }}:latest
         
@@ -100,8 +120,11 @@ jobs:
         sed -i 's|your-registry/cloud-cost-optimizer-backend:latest|${{ needs.build-and-push.outputs.backend_image }}|g' kustomization.yaml
         sed -i 's|your-registry/cloud-cost-optimizer-frontend:latest|${{ needs.build-and-push.outputs.frontend_image }}|g' kustomization.yaml
         
-        # Update IAM role ARN
-        sed -i 's|eks.amazonaws.com/role-arn: .*|eks.amazonaws.com/role-arn: ${{ secrets.COST_OPTIMIZER_ROLE_ARN }}|g' ../../base/service-account.yaml
+        # Update IAM role ARN - strip any debug output that might be appended
+        ROLE_ARN="${{ secrets.COST_OPTIMIZER_ROLE_ARN }}"
+        ROLE_ARN=$(echo "$ROLE_ARN" | sed 's/::debug::.*$//')
+        
+        sed -i "s|eks.amazonaws.com/role-arn: .*|eks.amazonaws.com/role-arn: $ROLE_ARN|g" ../../base/service-account.yaml
         
     - name: Deploy to EKS
       run: |
