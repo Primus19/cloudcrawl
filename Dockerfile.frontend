@@ -18,17 +18,6 @@ COPY src/ui/dashboard/eslint.config.js ./
 # Copy the rest of the application
 COPY src/ui/dashboard/ .
 
-# Modify Resources.tsx to not use DataGrid
-RUN sed -i 's/import { DataGrid, GridColDef } from "@mui\/x-data-grid";/\/\/ import { DataGrid, GridColDef } from "@mui\/x-data-grid";/' src/components/pages/Resources.tsx && \
-    sed -i 's/<DataGrid/\/\/ <DataGrid/' src/components/pages/Resources.tsx && \
-    sed -i 's/rows={resources}/\/\/ rows={resources}/' src/components/pages/Resources.tsx && \
-    sed -i 's/columns={columns}/\/\/ columns={columns}/' src/components/pages/Resources.tsx && \
-    sed -i 's/pageSize={10}/\/\/ pageSize={10}/' src/components/pages/Resources.tsx && \
-    sed -i 's/rowsPerPageOptions={[10, 25, 50]}/\/\/ rowsPerPageOptions={[10, 25, 50]}/' src/components/pages/Resources.tsx && \
-    sed -i 's/checkboxSelection/\/\/ checkboxSelection/' src/components/pages/Resources.tsx && \
-    sed -i 's/disableSelectionOnClick/\/\/ disableSelectionOnClick/' src/components/pages/Resources.tsx && \
-    sed -i 's/<\/DataGrid>/\/\/ <\/DataGrid>\n            <div>Resources table temporarily disabled<\/div>/' src/components/pages/Resources.tsx
-
 # Build the application
 RUN npm run build
 

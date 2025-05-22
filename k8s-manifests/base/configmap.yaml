@@ -4,5 +4,5 @@ metadata:
   name: cloud-cost-optimizer-config
   namespace: cloud-cost-optimizer
 data:
-  ENVIRONMENT: "production"
-  LOG_LEVEL: "info"
+  ENVIRONMENT: "development"
+  LOG_LEVEL: "debug"
