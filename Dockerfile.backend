@@ -2,30 +2,24 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
+# Install compatible versions of Flask and Werkzeug
+RUN pip install flask==2.0.1 werkzeug==2.0.3
 
-# Install Terraform
-RUN curl -fsSL https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip -o terraform.zip \
-    && unzip terraform.zip \
-    && mv terraform /usr/local/bin/ \
-    && rm terraform.zip
+# Install other dependencies
+RUN pip install boto3 google-cloud-storage azure-storage-blob \
+    terraform-local python-terraform pyyaml requests \
+    pytest pytest-cov flake8 black
 
-# Copy requirements first for better caching
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application
-COPY src/ ./src/
+# Copy application code
+COPY ./src /app/src
 
 # Set environment variables
+ENV FLASK_APP=/app/src/main.py
+ENV FLASK_ENV=production
 ENV PYTHONPATH=/app
-ENV FLASK_APP=src/main.py
 
+# Expose the port
 EXPOSE 5000
 
 # Run the application
-CMD ["python", "src/main.py"]
+CMD ["python", "/app/src/main.py"]
