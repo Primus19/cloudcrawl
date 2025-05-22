@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: directory-creator
+  namespace: cloud-cost-optimizer
+spec:
+  selector:
+    matchLabels:
+      app: directory-creator
+  template:
+    metadata:
+      labels:
+        app: directory-creator
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+      containers:
+      - name: directory-creator
+        image: busybox:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - >
+          mkdir -p /mnt/host/data/terraform-state /mnt/host/data/database &&
+          chmod 777 /mnt/host/data/terraform-state /mnt/host/data/database &&
+          echo "Directories created successfully" &&
+          sleep infinity
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: host-root
+          mountPath: /mnt/host
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
