@@ -6,6 +6,12 @@ WORKDIR /app
 COPY src/ui/dashboard/package*.json ./
 RUN npm install --legacy-peer-deps
 
+# Copy configuration files first to ensure they're in CommonJS format
+COPY src/ui/dashboard/postcss.config.js ./
+COPY src/ui/dashboard/vite.config.js ./
+COPY src/ui/dashboard/tailwind.config.js ./
+COPY src/ui/dashboard/eslint.config.js ./
+
 # Copy the rest of the application and build
 COPY src/ui/dashboard/ .
 RUN npm run build
