@@ -16,24 +16,27 @@ COPY src /app/src
 
 # Create __init__.py files to make directories into packages
 RUN touch /app/src/__init__.py
-RUN mkdir -p /app/src/api && touch /app/src/api/__init__.py
+
+# Create necessary API modules
+RUN mkdir -p /app/src/api && \
+    touch /app/src/api/__init__.py && \
+    echo 'from flask import Blueprint\n\naccounts_bp = Blueprint("accounts", __name__)\n\n@accounts_bp.route("/api/v1/accounts")\ndef list_accounts():\n    return {"accounts": []}' > /app/src/api/accounts.py && \
+    echo 'from flask import Blueprint\n\nresources_bp = Blueprint("resources", __name__)\n\n@resources_bp.route("/api/v1/resources")\ndef list_resources():\n    return {"resources": []}' > /app/src/api/resources.py && \
+    echo 'from flask import Blueprint\n\ncosts_bp = Blueprint("costs", __name__)\n\n@costs_bp.route("/api/v1/costs")\ndef get_costs():\n    return {"costs": []}' > /app/src/api/costs.py && \
+    echo 'from flask import Blueprint\n\nrecommendations_bp = Blueprint("recommendations", __name__)\n\n@recommendations_bp.route("/api/v1/recommendations")\ndef get_recommendations():\n    return {"recommendations": []}' > /app/src/api/recommendations.py && \
+    echo 'from flask import Blueprint\n\nactions_bp = Blueprint("actions", __name__)\n\n@actions_bp.route("/api/v1/actions")\ndef list_actions():\n    return {"actions": []}' > /app/src/api/actions.py && \
+    echo 'from flask import Blueprint\n\nworkflows_bp = Blueprint("workflows", __name__)\n\n@workflows_bp.route("/api/v1/workflows")\ndef list_workflows():\n    return {"workflows": []}' > /app/src/api/workflows.py
+
+# Create terraform API module
+RUN mkdir -p /app/src/terraform && \
+    touch /app/src/terraform/__init__.py && \
+    mkdir -p /app/src/terraform/api && \
+    touch /app/src/terraform/api/__init__.py && \
+    echo 'from flask import Blueprint\n\nterraform_bp = Blueprint("terraform", __name__)\n\n@terraform_bp.route("/api/v1/terraform/status")\ndef get_status():\n    return {"status": "ok"}' > /app/src/terraform/api/__init__.py
 
 # Create a wrapper script to handle imports correctly
-RUN echo '#!/usr/bin/env python3\n\
-import os\n\
-import sys\n\
-\n\
-# Add the current directory to Python path\n\
-sys.path.insert(0, os.path.abspath("."))\n\
-\n\
-# Import and run the application\n\
-from src.main import create_app\n\
-\n\
-if __name__ == "__main__":\n\
-    app = create_app()\n\
-    app.run(host="0.0.0.0", port=5000)\n\
-' > /app/run.py
-RUN chmod +x /app/run.py
+RUN echo '#!/usr/bin/env python3\nimport os\nimport sys\n\n# Add the current directory to Python path\nsys.path.insert(0, os.path.abspath("."))\n\n# Import and run the application\nfrom src.main import create_app\n\nif __name__ == "__main__":\n    app = create_app()\n    app.run(host="0.0.0.0", port=5000)\n' > /app/run.py && \
+    chmod +x /app/run.py
 
 # Set environment variables
 ENV FLASK_APP=/app/src/main.py
