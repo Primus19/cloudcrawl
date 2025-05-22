@@ -20,7 +20,7 @@ RUN touch /app/src/__init__.py
 # Create necessary API modules
 RUN mkdir -p /app/src/api && \
     touch /app/src/api/__init__.py && \
-    echo 'from flask import Blueprint\n\naccounts_bp = Blueprint("accounts", __name__)\n\n@accounts_bp.route("/api/v1/accounts")\ndef list_accounts():\n    return {"accounts": []}' > /app/src/api/accounts.py && \
+    echo 'from flask import Blueprint\n\naccounts_bp = Blueprint("accounts", __name__)\n\n@accounts_bp.route("/api/v1/accounts")\ndef list_accounts():\n    return {"accounts": []}\n\n@accounts_bp.route("/api/v1/health")\ndef health_check():\n    return {"status": "ok"}' > /app/src/api/accounts.py && \
     echo 'from flask import Blueprint\n\nresources_bp = Blueprint("resources", __name__)\n\n@resources_bp.route("/api/v1/resources")\ndef list_resources():\n    return {"resources": []}' > /app/src/api/resources.py && \
     echo 'from flask import Blueprint\n\ncosts_bp = Blueprint("costs", __name__)\n\n@costs_bp.route("/api/v1/costs")\ndef get_costs():\n    return {"costs": []}' > /app/src/api/costs.py && \
     echo 'from flask import Blueprint\n\nrecommendations_bp = Blueprint("recommendations", __name__)\n\n@recommendations_bp.route("/api/v1/recommendations")\ndef get_recommendations():\n    return {"recommendations": []}' > /app/src/api/recommendations.py && \
@@ -33,6 +33,9 @@ RUN mkdir -p /app/src/terraform && \
     mkdir -p /app/src/terraform/api && \
     touch /app/src/terraform/api/__init__.py && \
     echo 'from flask import Blueprint\n\nterraform_bp = Blueprint("terraform", __name__)\n\n@terraform_bp.route("/api/v1/terraform/status")\ndef get_status():\n    return {"status": "ok"}' > /app/src/terraform/api/__init__.py
+
+# Add a health endpoint directly to main.py
+RUN sed -i '/app = Flask/a \\\n    @app.route("/api/v1/health")\n    def health():\n        return {"status": "ok"}' /app/src/main.py
 
 # Create a wrapper script to handle imports correctly
 RUN echo '#!/usr/bin/env python3\nimport os\nimport sys\n\n# Add the current directory to Python path\nsys.path.insert(0, os.path.abspath("."))\n\n# Import and run the application\nfrom src.main import create_app\n\nif __name__ == "__main__":\n    app = create_app()\n    app.run(host="0.0.0.0", port=5000)\n' > /app/run.py && \
