@@ -4,5 +4,6 @@ metadata:
   name: kustomization-config
   namespace: cloud-cost-optimizer
 data:
-  BACKEND_IMAGE: "your-registry/cloud-cost-optimizer-backend:latest"
-  FRONTEND_IMAGE: "your-registry/cloud-cost-optimizer-frontend:latest"
+  # Removed image references from ConfigMap as they're now directly in deployment manifests
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "info"
