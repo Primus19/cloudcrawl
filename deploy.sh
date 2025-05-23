@@ -3,10 +3,10 @@
 # This script helps deploy the Cloud Cost Optimizer to EKS with custom image settings
 
 # Set your actual image repository and tag values here
-export BACKEND_IMAGE_REPO="your-actual-backend-image-repo"
-export BACKEND_IMAGE_TAG="your-actual-tag"
-export FRONTEND_IMAGE_REPO="your-actual-frontend-image-repo"
-export FRONTEND_IMAGE_TAG="your-actual-tag"
+export BACKEND_IMAGE_REPO="637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend"
+export BACKEND_IMAGE_TAG="latest"
+export FRONTEND_IMAGE_REPO="637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend"
+export FRONTEND_IMAGE_TAG="latest"
 
 # Build and push backend image
 echo "Building backend Docker image..."
