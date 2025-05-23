@@ -9,43 +9,18 @@ RUN pip install flask==2.0.1 werkzeug==2.0.3
 RUN pip install flask-cors flask-restful flask-sqlalchemy flask-migrate \
     boto3 google-cloud-storage azure-storage-blob \
     terraform-local python-terraform pyyaml requests \
-    pytest pytest-cov flake8 black psycopg2-binary cryptography
+    pytest pytest-cov flake8 black
 
-# Create necessary directories
-RUN mkdir -p /app/src/api /app/terraform/templates /app/terraform/state
-
-# Copy the src directory to /app/src
+# Copy the application code
 COPY src /app/src
 
 # Ensure all necessary __init__.py files exist
 RUN find /app/src -type d -exec touch {}/__init__.py \;
 
-# Create a health endpoint module
-RUN echo 'from flask import Blueprint\n\
-\n\
-health_bp = Blueprint("health", __name__)\n\
-\n\
-@health_bp.route("/api/v1/health")\n\
-def health_check():\n\
-    return {"status": "ok"}\n\
-' > /app/src/api/health.py
-
-# Create a minimal accounts.py file if it doesn't exist
-RUN mkdir -p /app/src/api && \
-    if [ ! -f /app/src/api/accounts.py ]; then \
-        echo 'from flask import Blueprint\n\
-\n\
-accounts_bp = Blueprint("accounts", __name__)\n\
-\n\
-@accounts_bp.route("/api/v1/accounts")\n\
-def list_accounts():\n\
-    return {"accounts": []}\n\
-\n\
-@accounts_bp.route("/api/v1/health")\n\
-def health_check():\n\
-    return {"status": "ok"}\n\
-' > /app/src/api/accounts.py; \
-    fi
+# Set environment variables
+ENV FLASK_APP=/app/src/main.py
+ENV FLASK_ENV=production
+ENV PYTHONPATH=/app
 
 # Create a wrapper script to handle imports correctly
 RUN echo '#!/usr/bin/env python3\n\
@@ -64,26 +39,8 @@ if __name__ == "__main__":\n\
 ' > /app/run.py
 RUN chmod +x /app/run.py
 
-# Create a main.py file with health endpoint
-RUN echo 'from flask import Flask\n\
-\n\
-def create_app():\n\
-    app = Flask(__name__)\n\
-    \n\
-    # Register blueprints\n\
-    from src.api.accounts import accounts_bp\n\
-    app.register_blueprint(accounts_bp)\n\
-    \n\
-    from src.api.health import health_bp\n\
-    app.register_blueprint(health_bp)\n\
-    \n\
-    # Add direct health endpoint\n\
-    @app.route("/api/v1/health")\n\
-    def health():\n\
-        return {"status": "ok"}\n\
-    \n\
-    return app\n\
-' > /app/src/main.py
+# Expose the port
+EXPOSE 5000
 
-# Set the entrypoint
-ENTRYPOINT ["python", "/app/run.py"]
+# Run the application using the wrapper script
+CMD ["python", "/app/run.py"]
