@@ -3,16 +3,10 @@ kind: Service
 metadata:
   name: cloud-cost-optimizer-frontend
   namespace: cloud-cost-optimizer
-  labels:
-    app: cloud-cost-optimizer
-    tier: frontend
 spec:
   selector:
-    app: cloud-cost-optimizer
-    tier: frontend
+    app: cloud-cost-optimizer-frontend
   ports:
   - port: 80
     targetPort: 80
-    protocol: TCP
-    name: http
-  type: LoadBalancer
+  type: ClusterIP

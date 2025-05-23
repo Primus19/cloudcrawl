@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init-job
+  namespace: cloud-cost-optimizer
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres-init
+        image: postgres:13
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Wait for PostgreSQL to be ready
+          until PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d postgres -c '\q'; do
+            echo "PostgreSQL is unavailable - sleeping"
+            sleep 2
+          done
+          
+          echo "PostgreSQL is up - executing schema"
+          
+          # Create database if it doesn't exist
+          PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d postgres -c "CREATE DATABASE IF NOT EXISTS $POSTGRES_DB;"
+          
+          # Apply schema
+          PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -f /schema/database_schema.sql
+          
+          echo "Database initialization completed successfully"
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_db
+        volumeMounts:
+        - name: schema-volume
+          mountPath: /schema
+      volumes:
+      - name: schema-volume
+        configMap:
+          name: postgres-schema
+      restartPolicy: OnFailure

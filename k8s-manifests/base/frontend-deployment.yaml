@@ -3,47 +3,40 @@ kind: Deployment
 metadata:
   name: cloud-cost-optimizer-frontend
   namespace: cloud-cost-optimizer
-  labels:
-    app: cloud-cost-optimizer
-    tier: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cloud-cost-optimizer
-      tier: frontend
+      app: cloud-cost-optimizer-frontend
   template:
     metadata:
       labels:
-        app: cloud-cost-optimizer
-        tier: frontend
+        app: cloud-cost-optimizer-frontend
     spec:
       containers:
       - name: frontend
-        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend:latest
-        imagePullPolicy: Always
+        image: ${FRONTEND_IMAGE}
         ports:
         - containerPort: 80
-          name: http
         env:
-        - name: API_URL
-          value: "http://cloud-cost-optimizer-backend:5000"
+        - name: REACT_APP_API_URL
+          value: "/api"
         resources:
           requests:
             memory: "128Mi"
             cpu: "100m"
           limits:
             memory: "256Mi"
-            cpu: "200m"
+            cpu: "300m"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
         livenessProbe:
           httpGet:
             path: /
             port: 80
           initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 15

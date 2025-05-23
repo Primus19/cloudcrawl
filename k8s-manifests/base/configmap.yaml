@@ -4,5 +4,7 @@ metadata:
   name: cloud-cost-optimizer-config
   namespace: cloud-cost-optimizer
 data:
-  ENVIRONMENT: "development"
-  LOG_LEVEL: "debug"
+  postgres_host: "postgres"
+  postgres_db: "cloud_cost_optimizer"
+  terraform_templates_dir: "/app/terraform/templates"
+  terraform_state_dir: "/app/terraform/state"

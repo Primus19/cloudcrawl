@@ -3,74 +3,119 @@ kind: Deployment
 metadata:
   name: cloud-cost-optimizer-backend
   namespace: cloud-cost-optimizer
-  labels:
-    app: cloud-cost-optimizer
-    tier: backend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cloud-cost-optimizer
-      tier: backend
+      app: cloud-cost-optimizer-backend
   template:
     metadata:
       labels:
-        app: cloud-cost-optimizer
-        tier: backend
+        app: cloud-cost-optimizer-backend
     spec:
-      serviceAccountName: cloud-cost-optimizer-sa
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:13
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d postgres -c '\q'; do
+            echo "PostgreSQL is unavailable - sleeping"
+            sleep 2
+          done
+          echo "PostgreSQL is up - continuing"
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_password
       containers:
       - name: backend
-        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend:latest
-        imagePullPolicy: Always
+        image: ${BACKEND_IMAGE}
         ports:
         - containerPort: 5000
-          name: http
         env:
-        - name: AWS_SHARED_CREDENTIALS_FILE
-          value: /etc/cloud-credentials/aws-credentials
-        - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: /etc/cloud-credentials/gcp-credentials.json
-        - name: AZURE_AUTH_LOCATION
-          value: /etc/cloud-credentials/azure-credentials.json
-        - name: TERRAFORM_STATE_DIR
-          value: /terraform/state
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):5432/$(POSTGRES_DB)"
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_db
         - name: TERRAFORM_TEMPLATES_DIR
-          value: /terraform/templates
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: terraform_templates_dir
+        - name: TERRAFORM_STATE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: terraform_state_dir
+        - name: CREDENTIAL_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: credential_encryption_key
         volumeMounts:
-        - name: cloud-credentials
-          mountPath: /etc/cloud-credentials
-          readOnly: true
         - name: terraform-state
-          mountPath: /terraform
-        - name: config-volume
-          mountPath: /app/config
+          mountPath: /app/terraform/state
+        - name: terraform-templates
+          mountPath: /app/terraform/templates
+        - name: database
+          mountPath: /database
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "100m"
           limits:
-            memory: "1Gi"
+            memory: "512Mi"
             cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
         livenessProbe:
           httpGet:
             path: /api/v1/health
             port: 5000
           initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/v1/health
-            port: 5000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 15
       volumes:
-      - name: cloud-credentials
-        secret:
-          secretName: cloud-credentials
       - name: terraform-state
         persistentVolumeClaim:
           claimName: terraform-state-new
-      - name: config-volume
-        configMap:
-          name: cloud-cost-optimizer-config
+      - name: terraform-templates
+        emptyDir: {}
+      - name: database
+        persistentVolumeClaim:
+          claimName: database-new

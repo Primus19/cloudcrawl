@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-schema
+  namespace: cloud-cost-optimizer
+data:
+  database_schema.sql: |
+    -- Create accounts table
+    CREATE TABLE IF NOT EXISTS accounts (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        provider VARCHAR(50) NOT NULL,  -- 'aws', 'gcp', 'azure'
+        status VARCHAR(50) NOT NULL,    -- 'active', 'inactive', 'error'
+        cost_data JSONB,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    -- Create account credentials table
+    CREATE TABLE IF NOT EXISTS account_credentials (
+        id SERIAL PRIMARY KEY,
+        account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+        credential_type VARCHAR(50) NOT NULL,  -- 'role_arn', 'access_key', etc.
+        credential_data TEXT NOT NULL,        -- Encrypted credentials
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    -- Create resources table
+    CREATE TABLE IF NOT EXISTS resources (
+        id SERIAL PRIMARY KEY,
+        account_id INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+        provider VARCHAR(50) NOT NULL,
+        resource_type VARCHAR(100) NOT NULL,
+        resource_id VARCHAR(255) NOT NULL,
+        name VARCHAR(255),
+        region VARCHAR(100),
+        metadata JSONB,
+        cost_data JSONB,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    -- Create terraform templates table
+    CREATE TABLE IF NOT EXISTS terraform_templates (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        provider VARCHAR(50) NOT NULL,  -- 'aws', 'gcp', 'azure'
+        service_type VARCHAR(100) NOT NULL,  -- 'ec2', 's3', 'rds', etc.
+        template_content TEXT NOT NULL,
+        variables JSONB,
+        version VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    -- Create terraform deployments table
+    CREATE TABLE IF NOT EXISTS terraform_deployments (
+        id SERIAL PRIMARY KEY,
+        template_id INTEGER REFERENCES terraform_templates(id),
+        account_id INTEGER REFERENCES accounts(id),
+        status VARCHAR(50) NOT NULL,  -- 'planning', 'planned', 'applied', 'destroyed', 'error'
+        variables_used JSONB,
+        output TEXT,
+        state_file TEXT,
+        cost_estimate JSONB,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+
+    -- Create indexes for performance
+    CREATE INDEX IF NOT EXISTS idx_resources_account_id ON resources(account_id);
+    CREATE INDEX IF NOT EXISTS idx_resources_provider ON resources(provider);
+    CREATE INDEX IF NOT EXISTS idx_resources_resource_type ON resources(resource_type);
+    CREATE INDEX IF NOT EXISTS idx_terraform_templates_provider ON terraform_templates(provider);
+    CREATE INDEX IF NOT EXISTS idx_terraform_templates_service_type ON terraform_templates(service_type);
+    CREATE INDEX IF NOT EXISTS idx_terraform_deployments_template_id ON terraform_deployments(template_id);
+    CREATE INDEX IF NOT EXISTS idx_terraform_deployments_account_id ON terraform_deployments(account_id);
+    CREATE INDEX IF NOT EXISTS idx_terraform_deployments_status ON terraform_deployments(status);

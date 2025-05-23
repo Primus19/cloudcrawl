@@ -1,21 +1,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
-resources:
-- namespace.yaml
-- service-account.yaml
-- rbac.yaml
-- storage-class.yaml
-- storage-class-ebs.yaml
-- terraform-state-new-pvc.yaml
-- database-new-pvc.yaml
-- backend-deployment.yaml
-- backend-service.yaml
-- frontend-deployment.yaml
-- frontend-service.yaml
-- ingress.yaml
-- configmap.yaml
-- secrets.yaml
-- horizontal-pod-autoscaler.yaml
-
 namespace: cloud-cost-optimizer
+resources:
+  - configmap.yaml
+  - secrets.yaml
+  - storage-class-ebs.yaml
+  - postgres-schema-configmap.yaml
+  - postgres-statefulset.yaml
+  - postgres-service.yaml
+  - postgres-init-job.yaml
+  - terraform-state-pvc.yaml
+  - database-pvc.yaml
+  - backend-deployment.yaml
+  - backend-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - ingress.yaml

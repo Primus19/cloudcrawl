@@ -1,97 +1,152 @@
 # Cloud Cost Optimizer - Setup Instructions
 
-This document provides instructions for setting up the Cloud Cost Optimizer project with all fixes applied.
+This document provides instructions for deploying the Cloud Cost Optimizer application with fully automated setup.
+
+## Overview
+
+The Cloud Cost Optimizer is a comprehensive solution for managing and optimizing cloud resources across AWS, GCP, and Azure. The application includes:
+
+- Account management for cloud providers
+- Resource discovery and visualization
+- Cost analysis and optimization recommendations
+- Terraform template management and deployment
+- Fully automated database setup
 
 ## Prerequisites
 
-- Kubernetes cluster (EKS or similar)
-- kubectl configured to access your cluster
-- Docker for building and pushing images
+- Kubernetes cluster with kubectl access
+- AWS EBS CSI driver installed (for EBS storage)
+- Container registry for storing images
 
-## Directory Setup for Persistent Volumes
+## Deployment Steps
 
-Before applying the Kubernetes manifests, you need to create the required directories on your nodes:
+### 1. Create Namespace
 
 ```bash
-# SSH into each node and run:
-sudo mkdir -p /mnt/data/terraform-state
-sudo mkdir -p /mnt/data/database
-sudo chmod 777 /mnt/data/terraform-state
-sudo chmod 777 /mnt/data/database
+kubectl create namespace cloud-cost-optimizer
 ```
 
-## Kubernetes Deployment
+### 2. Deploy Application
 
-1. Apply the Kubernetes manifests:
+The application is deployed using Kustomize, which handles all components including:
+- PostgreSQL database with automated schema initialization
+- Backend API server
+- Frontend web interface
+- All required ConfigMaps, Secrets, and PersistentVolumeClaims
 
 ```bash
-kubectl apply -k k8s-manifests/overlays/production/
+# From the repository root
+kubectl apply -k k8s-manifests/overlays/production
 ```
 
-2. If you encounter PVC errors because they already exist with a different storage class:
+This single command will:
+1. Create the EBS storage class
+2. Deploy PostgreSQL with persistent storage
+3. Initialize the database schema automatically
+4. Deploy the backend with health checks
+5. Deploy the frontend
+6. Create an Ingress for external access
+
+### 3. Build and Push Images
+
+Before deployment, build and push the Docker images:
 
 ```bash
-# Option 1: Delete existing PVCs (if you don't have important data)
-kubectl delete pvc database-pvc terraform-state-pvc -n cloud-cost-optimizer
-kubectl apply -k k8s-manifests/overlays/production/
+# Build and push backend image
+docker build -t your-registry/cloud-cost-optimizer-backend:latest -f Dockerfile.backend .
+docker push your-registry/cloud-cost-optimizer-backend:latest
 
-# Option 2: Update the storage class in your PV and PVC files to match existing ones
-# Edit k8s-manifests/base/persistent-volume-claims.yaml and change storageClassName to match your existing PVCs
-```
-
-3. Verify that the pods are running:
-
-```bash
-kubectl get pods -n cloud-cost-optimizer
-```
-
-## Frontend Build and Deployment
-
-1. Build the frontend Docker image:
-
-```bash
+# Build and push frontend image
 docker build -t your-registry/cloud-cost-optimizer-frontend:latest -f Dockerfile.frontend .
 docker push your-registry/cloud-cost-optimizer-frontend:latest
 ```
 
-2. Update the frontend deployment image if needed:
+Update the image references in `k8s-manifests/overlays/production/kustomization.yaml`:
 
-```bash
-kubectl set image deployment/cloud-cost-optimizer-frontend frontend=your-registry/cloud-cost-optimizer-frontend:latest -n cloud-cost-optimizer
+```yaml
+images:
+  - name: ${BACKEND_IMAGE}
+    newName: your-registry/cloud-cost-optimizer-backend
+    newTag: latest
+  - name: ${FRONTEND_IMAGE}
+    newName: your-registry/cloud-cost-optimizer-frontend
+    newTag: latest
+```
+
+## Configuration
+
+### Security Credentials
+
+For production deployment, update the secrets in `k8s-manifests/base/secrets.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloud-cost-optimizer-secrets
+  namespace: cloud-cost-optimizer
+type: Opaque
+stringData:
+  postgres_user: "postgres"
+  postgres_password: "changeme"  # Change this!
+  credential_encryption_key: "changeme_with_secure_random_key"  # Change this!
 ```
 
 ## Accessing the Application
 
-Once deployed, you can access the application through the configured ingress:
+After deployment, the application will be available at the Ingress address:
 
 ```bash
 kubectl get ingress -n cloud-cost-optimizer
 ```
 
-## Cloud Provider Integration
+## Features
 
-The application now includes a Cloud Accounts section for managing AWS, GCP, and Azure accounts. This allows you to:
+The Cloud Cost Optimizer provides:
 
-1. Add and manage cloud provider credentials
-2. View resources across multiple cloud providers
-3. Optimize costs across your entire cloud infrastructure
+1. **AWS Integration**:
+   - Account management with IAM role support
+   - Resource discovery for EC2, S3, RDS, Lambda, and EKS
+   - Cost analysis and optimization recommendations
+
+2. **Terraform Template Management**:
+   - Template creation and versioning
+   - Variable support and customization
+   - Cost estimation before deployment
+   - Deployment workflow with plan, apply, and destroy operations
+
+3. **Database**: Fully automated PostgreSQL setup with:
+   - Secure credential storage
+   - Resource metadata
+   - Cost data
+   - Terraform state management
 
 ## Troubleshooting
 
-If you encounter any issues:
+If you encounter issues:
 
-1. Check pod logs:
-```bash
-kubectl logs -f deployment/cloud-cost-optimizer-backend -n cloud-cost-optimizer
-kubectl logs -f deployment/cloud-cost-optimizer-frontend -n cloud-cost-optimizer
-```
+1. Check pod status:
+   ```bash
+   kubectl get pods -n cloud-cost-optimizer
+   ```
 
-2. Verify ConfigMap exists:
-```bash
-kubectl get configmap -n cloud-cost-optimizer
-```
+2. Check logs:
+   ```bash
+   kubectl logs -n cloud-cost-optimizer deployment/cloud-cost-optimizer-backend
+   kubectl logs -n cloud-cost-optimizer deployment/cloud-cost-optimizer-frontend
+   ```
 
-3. Check PVC status:
-```bash
-kubectl get pvc -n cloud-cost-optimizer
-```
+3. Verify database initialization:
+   ```bash
+   kubectl logs -n cloud-cost-optimizer job/postgres-init-job
+   ```
+
+## Extending the Application
+
+The Cloud Cost Optimizer is designed for easy extension to support GCP and Azure:
+
+1. Implement provider interfaces in `src/providers/`
+2. Add API endpoints in `src/api/`
+3. Update frontend components to support new providers
+
+All infrastructure is already in place to support multi-cloud operations.
