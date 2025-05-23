@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloud-cost-optimizer-backend
+  name: cloud-cost-optimizer-backend-v2
   namespace: cloud-cost-optimizer
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cloud-cost-optimizer-backend
+      app: cloud-cost-optimizer-backend-v2
   template:
     metadata:
       labels:
-        app: cloud-cost-optimizer-backend
+        app: cloud-cost-optimizer-backend-v2
     spec:
       initContainers:
       - name: wait-for-postgres
@@ -43,7 +43,7 @@ spec:
               key: postgres_password
       containers:
       - name: backend
-        image: ${BACKEND_IMAGE}
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend:latest
         ports:
         - containerPort: 5000
         env:
@@ -113,9 +113,9 @@ spec:
       volumes:
       - name: terraform-state
         persistentVolumeClaim:
-          claimName: terraform-state-new
+          claimName: terraform-state-v2
       - name: terraform-templates
         emptyDir: {}
       - name: database
         persistentVolumeClaim:
-          claimName: database-new
+          claimName: database-v2

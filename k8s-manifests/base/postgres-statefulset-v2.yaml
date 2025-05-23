@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres
+  name: postgres-v2
   namespace: cloud-cost-optimizer
 spec:
   serviceName: postgres
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: postgres-v2
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgres-v2
     spec:
       containers:
       - name: postgres
@@ -41,6 +41,7 @@ spec:
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+          subPath: postgres
   volumeClaimTemplates:
   - metadata:
       name: postgres-data

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloud-cost-optimizer-frontend
+  name: cloud-cost-optimizer-frontend-v2
   namespace: cloud-cost-optimizer
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cloud-cost-optimizer-frontend
+      app: cloud-cost-optimizer-frontend-v2
   template:
     metadata:
       labels:
-        app: cloud-cost-optimizer-frontend
+        app: cloud-cost-optimizer-frontend-v2
     spec:
       containers:
       - name: frontend
-        image: ${FRONTEND_IMAGE}
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend:latest
         ports:
         - containerPort: 80
         env:

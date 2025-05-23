@@ -5,8 +5,8 @@ metadata:
   namespace: cloud-cost-optimizer
 spec:
   selector:
-    app: cloud-cost-optimizer-frontend
+    app: cloud-cost-optimizer-frontend-v2
   ports:
   - port: 80
     targetPort: 80
-  type: ClusterIP
+  type: LoadBalancer

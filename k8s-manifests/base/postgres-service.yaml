@@ -5,7 +5,7 @@ metadata:
   namespace: cloud-cost-optimizer
 spec:
   selector:
-    app: postgres
+    app: postgres-v2
   ports:
   - port: 5432
     targetPort: 5432

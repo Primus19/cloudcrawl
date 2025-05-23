@@ -3,10 +3,6 @@ kind: Kustomization
 namespace: cloud-cost-optimizer
 resources:
   - ../../base
-images:
-  - name: ${BACKEND_IMAGE}
-    newName: your-registry/cloud-cost-optimizer-backend
-    newTag: latest
-  - name: ${FRONTEND_IMAGE}
-    newName: your-registry/cloud-cost-optimizer-frontend
-    newTag: latest
+patches:
+  - path: frontend-image-patch.yaml
+  - path: backend-image-patch.yaml

@@ -4,15 +4,15 @@ namespace: cloud-cost-optimizer
 resources:
   - configmap.yaml
   - secrets.yaml
-  - storage-class-ebs.yaml
+  - storage-class-ebs-v2.yaml
   - postgres-schema-configmap.yaml
-  - postgres-statefulset.yaml
+  - postgres-statefulset-v2.yaml
   - postgres-service.yaml
   - postgres-init-job.yaml
-  - terraform-state-pvc.yaml
-  - database-pvc.yaml
-  - backend-deployment.yaml
+  - terraform-state-v2-pvc.yaml
+  - database-v2-pvc.yaml
+  - backend-deployment-v2.yaml
   - backend-service.yaml
-  - frontend-deployment.yaml
+  - frontend-deployment-v2.yaml
   - frontend-service.yaml
   - ingress.yaml

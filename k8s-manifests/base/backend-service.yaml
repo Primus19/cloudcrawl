@@ -5,7 +5,7 @@ metadata:
   namespace: cloud-cost-optimizer
 spec:
   selector:
-    app: cloud-cost-optimizer-backend
+    app: cloud-cost-optimizer-backend-v2
   ports:
   - port: 80
     targetPort: 5000
