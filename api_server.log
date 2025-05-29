@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/ubuntu/cloudcrawl/cloudcrawl/src/api/app.py", line 12, in <module>
-    from src.api.auth import auth_bp
-ModuleNotFoundError: No module named 'src'
