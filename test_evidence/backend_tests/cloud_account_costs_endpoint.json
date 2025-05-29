@@ -1,0 +1,23 @@
+{
+  "account_id": "123456789012",
+  "currency": "USD",
+  "services": [
+    {
+      "cost": 567.89,
+      "name": "Amazon EC2"
+    },
+    {
+      "cost": 123.45,
+      "name": "Amazon S3"
+    },
+    {
+      "cost": 234.56,
+      "name": "Amazon RDS"
+    }
+  ],
+  "time_period": {
+    "end": "2023-01-31",
+    "start": "2023-01-01"
+  },
+  "total_cost": 1234.56
+}

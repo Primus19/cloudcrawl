@@ -1,0 +1,39 @@
+{
+  "aws": [
+    {
+      "account_id": "123456789012",
+      "id": "aws-account-1",
+      "name": "Production AWS Account",
+      "regions": [
+        "us-east-1",
+        "us-west-2"
+      ],
+      "status": "active"
+    },
+    {
+      "account_id": "987654321098",
+      "id": "aws-account-2",
+      "name": "Development AWS Account",
+      "regions": [
+        "us-east-1"
+      ],
+      "status": "active"
+    }
+  ],
+  "azure": [
+    {
+      "id": "azure-subscription-1",
+      "name": "Production Azure Subscription",
+      "status": "active",
+      "subscription_id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+    }
+  ],
+  "gcp": [
+    {
+      "id": "gcp-project-1",
+      "name": "Production GCP Project",
+      "project_id": "my-gcp-project-123",
+      "status": "active"
+    }
+  ]
+}

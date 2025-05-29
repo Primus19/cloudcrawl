@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: terraform-state-v2
+  namespace: cloud-cost-optimizer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc-v2
+  resources:
+    requests:
+      storage: 5Gi

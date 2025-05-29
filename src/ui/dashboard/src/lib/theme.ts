@@ -1,118 +1,62 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a dark theme with cybersecurity-inspired colors
+// Create a cybersecurity-focused dark theme
 const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#4caf50', // Green for success/action
+      main: '#4caf50',
       light: '#80e27e',
       dark: '#087f23',
-      contrastText: '#000000',
+      contrastText: '#000',
     },
     secondary: {
-      main: '#03a9f4', // Blue for information
-      light: '#67daff',
-      dark: '#007ac1',
-      contrastText: '#000000',
-    },
-    error: {
-      main: '#f44336', // Red for errors/critical issues
-      light: '#ff7961',
-      dark: '#ba000d',
-      contrastText: '#ffffff',
-    },
-    warning: {
-      main: '#ff9800', // Orange for warnings
-      light: '#ffc947',
-      dark: '#c66900',
-      contrastText: '#000000',
-    },
-    info: {
-      main: '#2196f3', // Light blue for info
+      main: '#2196f3',
       light: '#6ec6ff',
       dark: '#0069c0',
-      contrastText: '#000000',
-    },
-    success: {
-      main: '#4caf50', // Green for success
-      light: '#80e27e',
-      dark: '#087f23',
-      contrastText: '#000000',
+      contrastText: '#000',
     },
     background: {
-      default: '#121212', // Dark background
-      paper: '#1e1e1e', // Slightly lighter for cards/surfaces
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    info: {
+      main: '#29b6f6',
+    },
+    success: {
+      main: '#66bb6a',
     },
     text: {
       primary: '#ffffff',
-      secondary: '#b0bec5',
-      disabled: '#6c7a89',
-    },
-    divider: 'rgba(255, 255, 255, 0.12)',
-    // Custom colors for cost optimization
-    cost: {
-      high: '#f44336', // Red for high cost
-      medium: '#ff9800', // Orange for medium cost
-      low: '#4caf50', // Green for low cost
-      saving: '#00e676', // Bright green for savings
+      secondary: 'rgba(255, 255, 255, 0.7)',
+      disabled: 'rgba(255, 255, 255, 0.5)',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '2.5rem',
       fontWeight: 500,
     },
     h2: {
-      fontSize: '2rem',
       fontWeight: 500,
     },
     h3: {
-      fontSize: '1.75rem',
       fontWeight: 500,
     },
     h4: {
-      fontSize: '1.5rem',
       fontWeight: 500,
     },
     h5: {
-      fontSize: '1.25rem',
       fontWeight: 500,
     },
     h6: {
-      fontSize: '1rem',
       fontWeight: 500,
-    },
-    subtitle1: {
-      fontSize: '1rem',
-      fontWeight: 400,
-    },
-    subtitle2: {
-      fontSize: '0.875rem',
-      fontWeight: 500,
-    },
-    body1: {
-      fontSize: '1rem',
-      fontWeight: 400,
-    },
-    body2: {
-      fontSize: '0.875rem',
-      fontWeight: 400,
-    },
-    button: {
-      fontSize: '0.875rem',
-      fontWeight: 500,
-      textTransform: 'none',
-    },
-    caption: {
-      fontSize: '0.75rem',
-      fontWeight: 400,
-    },
-    overline: {
-      fontSize: '0.75rem',
-      fontWeight: 400,
-      textTransform: 'uppercase',
     },
   },
   shape: {
@@ -122,15 +66,14 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1e1e1e',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#1a1a1a',
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#1e1e1e',
+          backgroundColor: '#1a1a1a',
           borderRight: '1px solid rgba(255, 255, 255, 0.12)',
         },
       },
@@ -140,38 +83,38 @@ const theme = createTheme({
         root: {
           backgroundColor: '#1e1e1e',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 4,
           textTransform: 'none',
-          fontWeight: 500,
+          borderRadius: 4,
         },
         contained: {
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-        },
-      },
-    },
-    MuiTableHead: {
-      styleOverrides: {
-        root: {
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        },
-      },
-    },
-    MuiTableRow: {
-      styleOverrides: {
-        root: {
-          '&:nth-of-type(odd)': {
-            backgroundColor: 'rgba(255, 255, 255, 0.02)',
-          },
+          boxShadow: 'none',
           '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
           },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        },
+        head: {
+          fontWeight: 600,
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
         },
       },
     },
@@ -184,26 +127,5 @@ const theme = createTheme({
     },
   },
 });
-
-// Add custom types to the theme
-declare module '@mui/material/styles' {
-  interface Palette {
-    cost: {
-      high: string;
-      medium: string;
-      low: string;
-      saving: string;
-    };
-  }
-  
-  interface PaletteOptions {
-    cost?: {
-      high: string;
-      medium: string;
-      low: string;
-      saving: string;
-    };
-  }
-}
 
 export default theme;

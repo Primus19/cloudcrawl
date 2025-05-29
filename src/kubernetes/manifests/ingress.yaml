@@ -1,0 +1,31 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudcrawl-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: cloudcrawl.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: cloudcrawl-api
+            port:
+              number: 5000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cloudcrawl-ui
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - cloudcrawl.example.com
+    secretName: cloudcrawl-tls

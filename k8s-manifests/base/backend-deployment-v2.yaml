@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-cost-optimizer-backend-v2
+  namespace: cloud-cost-optimizer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-cost-optimizer-backend-v2
+  template:
+    metadata:
+      labels:
+        app: cloud-cost-optimizer-backend-v2
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:13
+        command:
+        - /bin/bash
+        - -c
+        - |
+          until PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d postgres -c '\q'; do
+            echo "PostgreSQL is unavailable - sleeping"
+            sleep 2
+          done
+          echo "PostgreSQL is up - continuing"
+        env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_password
+      containers:
+      - name: backend
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):5432/$(POSTGRES_DB)"
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_host
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: postgres_password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: postgres_db
+        - name: TERRAFORM_TEMPLATES_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: terraform_templates_dir
+        - name: TERRAFORM_STATE_DIR
+          valueFrom:
+            configMapKeyRef:
+              name: cloud-cost-optimizer-config
+              key: terraform_state_dir
+        - name: CREDENTIAL_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloud-cost-optimizer-secrets
+              key: credential_encryption_key
+        volumeMounts:
+        - name: terraform-state
+          mountPath: /app/terraform/state
+        - name: terraform-templates
+          mountPath: /app/terraform/templates
+        - name: database
+          mountPath: /database
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+      volumes:
+      - name: terraform-state
+        persistentVolumeClaim:
+          claimName: terraform-state-v2
+      - name: terraform-templates
+        emptyDir: {}
+      - name: database
+        persistentVolumeClaim:
+          claimName: database-v2

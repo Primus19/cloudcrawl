@@ -1,0 +1,126 @@
+{
+    "apiVersion": "apps/v1",
+    "kind": "StatefulSet",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"StatefulSet\",\"metadata\":{\"annotations\":{},\"name\":\"postgres\",\"namespace\":\"cloud-cost-optimizer\"},\"spec\":{\"replicas\":1,\"selector\":{\"matchLabels\":{\"app\":\"postgres\"}},\"serviceName\":\"postgres\",\"template\":{\"metadata\":{\"labels\":{\"app\":\"postgres\"}},\"spec\":{\"containers\":[{\"env\":[{\"name\":\"POSTGRES_DB\",\"value\":\"app_db\"},{\"name\":\"POSTGRES_USER\",\"value\":\"app_user\"},{\"name\":\"POSTGRES_PASSWORD\",\"value\":\"app_password\"},{\"name\":\"PGDATA\",\"value\":\"/var/lib/postgresql/data/pgdata\"}],\"image\":\"postgres:13\",\"name\":\"postgres\",\"ports\":[{\"containerPort\":5432}],\"volumeMounts\":[{\"mountPath\":\"/var/lib/postgresql/data/pgdata\",\"name\":\"postgres-storage\"}]}]}},\"volumeClaimTemplates\":[{\"metadata\":{\"name\":\"postgres-storage\"},\"spec\":{\"accessModes\":[\"ReadWriteOnce\"],\"resources\":{\"requests\":{\"storage\":\"5Gi\"}},\"storageClassName\":\"ebs-sc\"}}]}}\n"
+        },
+        "creationTimestamp": "2025-05-29T03:09:50Z",
+        "generation": 1,
+        "name": "postgres",
+        "namespace": "cloud-cost-optimizer",
+        "resourceVersion": "9206",
+        "uid": "3ca70ac5-62c8-4d99-8637-18714f18cb37"
+    },
+    "spec": {
+        "persistentVolumeClaimRetentionPolicy": {
+            "whenDeleted": "Retain",
+            "whenScaled": "Retain"
+        },
+        "podManagementPolicy": "OrderedReady",
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "postgres"
+            }
+        },
+        "serviceName": "postgres",
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "postgres"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "POSTGRES_DB",
+                                "value": "app_db"
+                            },
+                            {
+                                "name": "POSTGRES_USER",
+                                "value": "app_user"
+                            },
+                            {
+                                "name": "POSTGRES_PASSWORD",
+                                "value": "app_password"
+                            },
+                            {
+                                "name": "PGDATA",
+                                "value": "/var/lib/postgresql/data/pgdata"
+                            }
+                        ],
+                        "image": "postgres:13",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "postgres",
+                        "ports": [
+                            {
+                                "containerPort": 5432,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "resources": {},
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/var/lib/postgresql/data/pgdata",
+                                "name": "postgres-storage"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        },
+        "updateStrategy": {
+            "rollingUpdate": {
+                "partition": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "volumeClaimTemplates": [
+            {
+                "apiVersion": "v1",
+                "kind": "PersistentVolumeClaim",
+                "metadata": {
+                    "creationTimestamp": null,
+                    "name": "postgres-storage"
+                },
+                "spec": {
+                    "accessModes": [
+                        "ReadWriteOnce"
+                    ],
+                    "resources": {
+                        "requests": {
+                            "storage": "5Gi"
+                        }
+                    },
+                    "storageClassName": "ebs-sc",
+                    "volumeMode": "Filesystem"
+                },
+                "status": {
+                    "phase": "Pending"
+                }
+            }
+        ]
+    },
+    "status": {
+        "availableReplicas": 0,
+        "collisionCount": 0,
+        "currentReplicas": 1,
+        "currentRevision": "postgres-6d67bcf577",
+        "observedGeneration": 1,
+        "replicas": 1,
+        "updateRevision": "postgres-6d67bcf577",
+        "updatedReplicas": 1
+    }
+}

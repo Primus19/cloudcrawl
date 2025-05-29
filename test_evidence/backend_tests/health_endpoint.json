@@ -1,0 +1,9 @@
+{
+  "services": {
+    "ai": "up",
+    "api": "up",
+    "database": "up"
+  },
+  "status": "healthy",
+  "version": "1.0.0"
+}

@@ -1,0 +1,47 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcrawl-ui
+  labels:
+    app: cloudcrawl
+    component: ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudcrawl
+      component: ui
+  template:
+    metadata:
+      labels:
+        app: cloudcrawl
+        component: ui
+    spec:
+      containers:
+      - name: ui
+        image: cloudcrawl/ui:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: API_URL
+          value: "http://cloudcrawl-api:5000"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20

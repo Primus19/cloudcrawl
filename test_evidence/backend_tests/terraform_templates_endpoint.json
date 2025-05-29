@@ -1,0 +1,222 @@
+{
+  "templates": [
+    {
+      "category": "compute",
+      "created_at": "2025-05-25T14:58:36.506592",
+      "description": "Creates an AWS EC2 instance with customizable instance type and AMI.",
+      "files": {
+        "main.tf": "\nprovider \"aws\" {\n  region = var.region\n}\n\nresource \"aws_instance\" \"example\" {\n  ami           = var.ami\n  instance_type = var.instance_type\n  \n  tags = {\n    Name = var.name\n  }\n}\n\noutput \"instance_id\" {\n  value = aws_instance.example.id\n}\n\noutput \"public_ip\" {\n  value = aws_instance.example.public_ip\n}\n",
+        "variables.tf": "\nvariable \"region\" {\n  description = \"AWS region\"\n  type        = string\n  default     = \"us-west-2\"\n}\n\nvariable \"ami\" {\n  description = \"AMI ID\"\n  type        = string\n  default     = \"ami-0c55b159cbfafe1f0\"\n}\n\nvariable \"instance_type\" {\n  description = \"Instance type\"\n  type        = string\n  default     = \"t3.micro\"\n}\n\nvariable \"name\" {\n  description = \"Name tag\"\n  type        = string\n  default     = \"example-instance\"\n}\n"
+      },
+      "id": "5ff84dc0-4f87-4cc4-b0b3-befa09499510",
+      "name": "AWS EC2 Instance",
+      "provider": "aws",
+      "tags": [
+        "aws",
+        "ec2",
+        "compute"
+      ],
+      "updated_at": "2025-05-25T14:58:36.506605",
+      "variables": [
+        {
+          "default": "us-west-2",
+          "description": "AWS region",
+          "name": "region",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "ami-0c55b159cbfafe1f0",
+          "description": "AMI ID",
+          "name": "ami",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "t3.micro",
+          "description": "Instance type",
+          "name": "instance_type",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "example-instance",
+          "description": "Name tag",
+          "name": "name",
+          "required": false,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "category": "storage",
+      "created_at": "2025-05-25T14:58:36.506615",
+      "description": "Creates an AWS S3 bucket with customizable settings.",
+      "files": {
+        "main.tf": "\nprovider \"aws\" {\n  region = var.region\n}\n\nresource \"aws_s3_bucket\" \"example\" {\n  bucket = var.bucket_name\n  acl    = var.acl\n  \n  versioning {\n    enabled = var.versioning_enabled\n  }\n  \n  tags = {\n    Name = var.bucket_name\n  }\n}\n\noutput \"bucket_id\" {\n  value = aws_s3_bucket.example.id\n}\n\noutput \"bucket_arn\" {\n  value = aws_s3_bucket.example.arn\n}\n",
+        "variables.tf": "\nvariable \"region\" {\n  description = \"AWS region\"\n  type        = string\n  default     = \"us-west-2\"\n}\n\nvariable \"bucket_name\" {\n  description = \"S3 bucket name\"\n  type        = string\n}\n\nvariable \"acl\" {\n  description = \"Bucket ACL\"\n  type        = string\n  default     = \"private\"\n}\n\nvariable \"versioning_enabled\" {\n  description = \"Enable versioning\"\n  type        = bool\n  default     = false\n}\n"
+      },
+      "id": "58748cb0-7cb2-41e6-bdd4-e658ed4475b6",
+      "name": "AWS S3 Bucket",
+      "provider": "aws",
+      "tags": [
+        "aws",
+        "s3",
+        "storage"
+      ],
+      "updated_at": "2025-05-25T14:58:36.506617",
+      "variables": [
+        {
+          "default": "us-west-2",
+          "description": "AWS region",
+          "name": "region",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "description": "S3 bucket name",
+          "name": "bucket_name",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "private",
+          "description": "Bucket ACL",
+          "name": "acl",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": false,
+          "description": "Enable versioning",
+          "name": "versioning_enabled",
+          "required": false,
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "category": "compute",
+      "created_at": "2025-05-25T14:58:36.506631",
+      "description": "Creates a Google Cloud Platform Compute Engine instance.",
+      "files": {
+        "main.tf": "\nprovider \"google\" {\n  project = var.project\n  region  = var.region\n  zone    = var.zone\n}\n\nresource \"google_compute_instance\" \"example\" {\n  name         = var.name\n  machine_type = var.machine_type\n  \n  boot_disk {\n    initialize_params {\n      image = var.image\n    }\n  }\n  \n  network_interface {\n    network = \"default\"\n    \n    access_config {\n      // Ephemeral IP\n    }\n  }\n}\n\noutput \"instance_id\" {\n  value = google_compute_instance.example.id\n}\n\noutput \"instance_name\" {\n  value = google_compute_instance.example.name\n}\n",
+        "variables.tf": "\nvariable \"project\" {\n  description = \"GCP project ID\"\n  type        = string\n}\n\nvariable \"region\" {\n  description = \"GCP region\"\n  type        = string\n  default     = \"us-central1\"\n}\n\nvariable \"zone\" {\n  description = \"GCP zone\"\n  type        = string\n  default     = \"us-central1-a\"\n}\n\nvariable \"name\" {\n  description = \"Instance name\"\n  type        = string\n  default     = \"example-instance\"\n}\n\nvariable \"machine_type\" {\n  description = \"Machine type\"\n  type        = string\n  default     = \"e2-medium\"\n}\n\nvariable \"image\" {\n  description = \"Boot disk image\"\n  type        = string\n  default     = \"debian-cloud/debian-10\"\n}\n"
+      },
+      "id": "5fce3054-2189-4b49-bf3d-84aefdb6c6cc",
+      "name": "GCP Compute Instance",
+      "provider": "gcp",
+      "tags": [
+        "gcp",
+        "compute",
+        "instance"
+      ],
+      "updated_at": "2025-05-25T14:58:36.506633",
+      "variables": [
+        {
+          "description": "GCP project ID",
+          "name": "project",
+          "required": true,
+          "type": "string"
+        },
+        {
+          "default": "us-central1",
+          "description": "GCP region",
+          "name": "region",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "us-central1-a",
+          "description": "GCP zone",
+          "name": "zone",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "example-instance",
+          "description": "Instance name",
+          "name": "name",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "e2-medium",
+          "description": "Machine type",
+          "name": "machine_type",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "debian-cloud/debian-10",
+          "description": "Boot disk image",
+          "name": "image",
+          "required": false,
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "category": "compute",
+      "created_at": "2025-05-25T14:58:36.506644",
+      "description": "Creates an Azure Virtual Machine with customizable settings.",
+      "files": {
+        "main.tf": "\nprovider \"azurerm\" {\n  features {}\n}\n\nresource \"azurerm_resource_group\" \"example\" {\n  name     = var.resource_group_name\n  location = var.location\n}\n\nresource \"azurerm_virtual_network\" \"example\" {\n  name                = \"${var.name}-network\"\n  address_space       = [\"10.0.0.0/16\"]\n  location            = azurerm_resource_group.example.location\n  resource_group_name = azurerm_resource_group.example.name\n}\n\nresource \"azurerm_subnet\" \"example\" {\n  name                 = \"internal\"\n  resource_group_name  = azurerm_resource_group.example.name\n  virtual_network_name = azurerm_virtual_network.example.name\n  address_prefixes     = [\"10.0.2.0/24\"]\n}\n\nresource \"azurerm_network_interface\" \"example\" {\n  name                = \"${var.name}-nic\"\n  location            = azurerm_resource_group.example.location\n  resource_group_name = azurerm_resource_group.example.name\n\n  ip_configuration {\n    name                          = \"internal\"\n    subnet_id                     = azurerm_subnet.example.id\n    private_ip_address_allocation = \"Dynamic\"\n  }\n}\n\nresource \"azurerm_virtual_machine\" \"example\" {\n  name                  = var.name\n  location              = azurerm_resource_group.example.location\n  resource_group_name   = azurerm_resource_group.example.name\n  network_interface_ids = [azurerm_network_interface.example.id]\n  vm_size               = var.vm_size\n\n  storage_image_reference {\n    publisher = \"Canonical\"\n    offer     = \"UbuntuServer\"\n    sku       = \"18.04-LTS\"\n    version   = \"latest\"\n  }\n\n  storage_os_disk {\n    name              = \"${var.name}-osdisk\"\n    caching           = \"ReadWrite\"\n    create_option     = \"FromImage\"\n    managed_disk_type = \"Standard_LRS\"\n  }\n\n  os_profile {\n    computer_name  = var.name\n    admin_username = var.admin_username\n    admin_password = var.admin_password\n  }\n\n  os_profile_linux_config {\n    disable_password_authentication = false\n  }\n}\n\noutput \"vm_id\" {\n  value = azurerm_virtual_machine.example.id\n}\n\noutput \"vm_name\" {\n  value = azurerm_virtual_machine.example.name\n}\n",
+        "variables.tf": "\nvariable \"resource_group_name\" {\n  description = \"Resource group name\"\n  type        = string\n  default     = \"example-resources\"\n}\n\nvariable \"location\" {\n  description = \"Azure location\"\n  type        = string\n  default     = \"eastus\"\n}\n\nvariable \"name\" {\n  description = \"VM name\"\n  type        = string\n  default     = \"example-vm\"\n}\n\nvariable \"vm_size\" {\n  description = \"VM size\"\n  type        = string\n  default     = \"Standard_DS1_v2\"\n}\n\nvariable \"admin_username\" {\n  description = \"Admin username\"\n  type        = string\n  default     = \"adminuser\"\n}\n\nvariable \"admin_password\" {\n  description = \"Admin password\"\n  type        = string\n  sensitive   = true\n}\n"
+      },
+      "id": "3f59dbf0-e018-4450-be6e-2b5aa2132ea3",
+      "name": "Azure Virtual Machine",
+      "provider": "azure",
+      "tags": [
+        "azure",
+        "vm",
+        "compute"
+      ],
+      "updated_at": "2025-05-25T14:58:36.506646",
+      "variables": [
+        {
+          "default": "example-resources",
+          "description": "Resource group name",
+          "name": "resource_group_name",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "eastus",
+          "description": "Azure location",
+          "name": "location",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "example-vm",
+          "description": "VM name",
+          "name": "name",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "Standard_DS1_v2",
+          "description": "VM size",
+          "name": "vm_size",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "default": "adminuser",
+          "description": "Admin username",
+          "name": "admin_username",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "description": "Admin password",
+          "name": "admin_password",
+          "required": true,
+          "sensitive": true,
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}

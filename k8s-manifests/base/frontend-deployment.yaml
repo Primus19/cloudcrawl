@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ${FRONTEND_IMAGE}
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend
         ports:
         - containerPort: 80
         env:

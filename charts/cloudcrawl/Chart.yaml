@@ -1,0 +1,9 @@
+apiVersion: v2
+name: cloudcrawl
+description: A Helm chart for CloudCrawl - Cloud Cost Optimization Platform
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: CloudCrawl Team
+    email: support@cloudcrawl.io

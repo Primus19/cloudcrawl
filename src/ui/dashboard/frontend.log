@@ -1,0 +1,10 @@
+
+> cloud-cost-optimizer-frontend@1.0.0 dev
+> vite --host 0.0.0.0 --port 3002
+
+
+  VITE v4.5.14  ready in 254 ms
+
+  ➜  Local:   http://localhost:3002/
+  ➜  Network: http://169.254.0.21:3002/
+  ➜  press h to show help

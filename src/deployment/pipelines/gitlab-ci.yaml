@@ -1,0 +1,33 @@
+
+type: gitlab_ci
+provider: gitlab
+name: CloudCrawl GitLab CI/CD Pipeline
+description: GitLab CI/CD pipeline for building, testing, and deploying CloudCrawl
+
+stages:
+  - name: build
+    description: Build the application
+    script:
+      - npm ci
+      - npm run build
+    artifacts:
+      paths:
+        - dist/
+
+  - name: test
+    description: Run tests
+    script:
+      - npm test
+      - npm run test:integration
+    dependencies:
+      - build
+
+  - name: deploy
+    description: Deploy to environment
+    script:
+      - helm upgrade --install cloudcrawl ./charts/cloudcrawl --namespace $NAMESPACE --set image.tag=$VERSION
+    dependencies:
+      - build
+      - test
+    only:
+      - main

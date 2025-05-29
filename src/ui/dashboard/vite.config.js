@@ -1,41 +1,37 @@
 // CommonJS syntax for vite.config.js
-const path = require("path");
-const react = require("@vitejs/plugin-react");
-const { defineConfig } = require("vite");
+const { defineConfig } = require('vite');
+const react = require('@vitejs/plugin-react');
 
 module.exports = defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  build: {
-    outDir: 'build',
-    sourcemap: true,
-    rollupOptions: {
-      external: ['@mui/x-data-grid'],
-      output: {
-        globals: {
-          '@mui/x-data-grid': 'MuiXDataGrid'
-        },
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          mui: ['@mui/material', '@mui/icons-material']
-        }
-      }
-    }
-  },
-  optimizeDeps: {
-    include: ['@mui/material', '@mui/icons-material', '@mui/x-data-grid']
-  },
   server: {
-    port: 3000,
+    host: '0.0.0.0',
+    port: 3002,
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-      },
+        secure: false
+      }
     },
+    cors: true,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '0.0.0.0',
+      '.manusvm.computer'
+    ]
   },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    strictPort: true,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '0.0.0.0',
+      '.manusvm.computer'
+    ]
+  }
 });

@@ -1,0 +1,10 @@
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMGMwOGNmZjUtMGM3YS00ZjQ2LTljNGUtN2NkZDM0YjE0YzBlIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTc0ODI3MjczNX0.TpCNmcNyjGcPu9tyPpr-xE1LSf2mrg-6ULlh-XL74jE",
+  "user": {
+    "email": "admin@example.com",
+    "full_name": "Admin User",
+    "id": "0c08cff5-0c7a-4f46-9c4e-7cdd34b14c0e",
+    "role": "admin",
+    "username": "admin"
+  }
+}

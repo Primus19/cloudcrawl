@@ -1,0 +1,10 @@
+{
+  "account_id": "123456789012",
+  "id": "aws-account-1",
+  "name": "Production AWS Account",
+  "regions": [
+    "us-east-1",
+    "us-west-2"
+  ],
+  "status": "active"
+}

@@ -1,0 +1,90 @@
+{
+  "manifests": [
+    {
+      "api_version": "apps/v1",
+      "content": "\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: cloudcrawl-api\n  labels:\n    app: cloudcrawl\n    component: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: cloudcrawl\n      component: api\n  template:\n    metadata:\n      labels:\n        app: cloudcrawl\n        component: api\n    spec:\n      containers:\n      - name: api\n        image: cloudcrawl/api:latest\n        ports:\n        - containerPort: 5000\n        env:\n        - name: PORT\n          value: \"5000\"\n        - name: JWT_SECRET_KEY\n          valueFrom:\n            secretKeyRef:\n              name: cloudcrawl-secrets\n              key: jwt-secret\n        resources:\n          limits:\n            cpu: \"1\"\n            memory: \"1Gi\"\n          requests:\n            cpu: \"500m\"\n            memory: \"512Mi\"\n        readinessProbe:\n          httpGet:\n            path: /health\n            port: 5000\n          initialDelaySeconds: 5\n          periodSeconds: 10\n        livenessProbe:\n          httpGet:\n            path: /health\n            port: 5000\n          initialDelaySeconds: 15\n          periodSeconds: 20\n",
+      "filename": "api-deployment.yaml",
+      "kind": "Deployment",
+      "metadata": {
+        "labels": {
+          "app": "cloudcrawl",
+          "component": "api"
+        },
+        "name": "cloudcrawl-api"
+      },
+      "name": "api-deployment",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/api-deployment.yaml"
+    },
+    {
+      "api_version": "apps/v1",
+      "content": "\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: cloudcrawl-ui\n  labels:\n    app: cloudcrawl\n    component: ui\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: cloudcrawl\n      component: ui\n  template:\n    metadata:\n      labels:\n        app: cloudcrawl\n        component: ui\n    spec:\n      containers:\n      - name: ui\n        image: cloudcrawl/ui:latest\n        ports:\n        - containerPort: 80\n        env:\n        - name: API_URL\n          value: \"http://cloudcrawl-api:5000\"\n        resources:\n          limits:\n            cpu: \"500m\"\n            memory: \"512Mi\"\n          requests:\n            cpu: \"200m\"\n            memory: \"256Mi\"\n        readinessProbe:\n          httpGet:\n            path: /\n            port: 80\n          initialDelaySeconds: 5\n          periodSeconds: 10\n        livenessProbe:\n          httpGet:\n            path: /\n            port: 80\n          initialDelaySeconds: 15\n          periodSeconds: 20\n",
+      "filename": "ui-deployment.yaml",
+      "kind": "Deployment",
+      "metadata": {
+        "labels": {
+          "app": "cloudcrawl",
+          "component": "ui"
+        },
+        "name": "cloudcrawl-ui"
+      },
+      "name": "ui-deployment",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/ui-deployment.yaml"
+    },
+    {
+      "api_version": "v1",
+      "content": "\napiVersion: v1\nkind: Service\nmetadata:\n  name: cloudcrawl-api\n  labels:\n    app: cloudcrawl\n    component: api\nspec:\n  selector:\n    app: cloudcrawl\n    component: api\n  ports:\n  - port: 5000\n    targetPort: 5000\n    protocol: TCP\n  type: ClusterIP\n",
+      "filename": "api-service.yaml",
+      "kind": "Service",
+      "metadata": {
+        "labels": {
+          "app": "cloudcrawl",
+          "component": "api"
+        },
+        "name": "cloudcrawl-api"
+      },
+      "name": "api-service",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/api-service.yaml"
+    },
+    {
+      "api_version": "v1",
+      "content": "\napiVersion: v1\nkind: Service\nmetadata:\n  name: cloudcrawl-ui\n  labels:\n    app: cloudcrawl\n    component: ui\nspec:\n  selector:\n    app: cloudcrawl\n    component: ui\n  ports:\n  - port: 80\n    targetPort: 80\n    protocol: TCP\n  type: ClusterIP\n",
+      "filename": "ui-service.yaml",
+      "kind": "Service",
+      "metadata": {
+        "labels": {
+          "app": "cloudcrawl",
+          "component": "ui"
+        },
+        "name": "cloudcrawl-ui"
+      },
+      "name": "ui-service",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/ui-service.yaml"
+    },
+    {
+      "api_version": "networking.k8s.io/v1",
+      "content": "\napiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: cloudcrawl-ingress\n  annotations:\n    kubernetes.io/ingress.class: nginx\n    nginx.ingress.kubernetes.io/ssl-redirect: \"true\"\nspec:\n  rules:\n  - host: cloudcrawl.example.com\n    http:\n      paths:\n      - path: /api\n        pathType: Prefix\n        backend:\n          service:\n            name: cloudcrawl-api\n            port:\n              number: 5000\n      - path: /\n        pathType: Prefix\n        backend:\n          service:\n            name: cloudcrawl-ui\n            port:\n              number: 80\n  tls:\n  - hosts:\n    - cloudcrawl.example.com\n    secretName: cloudcrawl-tls\n",
+      "filename": "ingress.yaml",
+      "kind": "Ingress",
+      "metadata": {
+        "annotations": {
+          "kubernetes.io/ingress.class": "nginx",
+          "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+        },
+        "name": "cloudcrawl-ingress"
+      },
+      "name": "ingress",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/ingress.yaml"
+    },
+    {
+      "api_version": "v1",
+      "content": "\napiVersion: v1\nkind: Secret\nmetadata:\n  name: cloudcrawl-secrets\ntype: Opaque\ndata:\n  jwt-secret: c2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQ=  # base64 encoded \"secret-key-for-development\"\n",
+      "filename": "secrets.yaml",
+      "kind": "Secret",
+      "metadata": {
+        "name": "cloudcrawl-secrets"
+      },
+      "name": "secrets",
+      "path": "/home/ubuntu/cloudcrawl/cloudcrawl/src/kubernetes/manifests/secrets.yaml"
+    }
+  ]
+}

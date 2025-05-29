@@ -1,0 +1,52 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcrawl-api
+  labels:
+    app: cloudcrawl
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudcrawl
+      component: api
+  template:
+    metadata:
+      labels:
+        app: cloudcrawl
+        component: api
+    spec:
+      containers:
+      - name: api
+        image: cloudcrawl/api:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PORT
+          value: "5000"
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cloudcrawl-secrets
+              key: jwt-secret
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20

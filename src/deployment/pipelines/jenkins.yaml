@@ -1,0 +1,28 @@
+
+type: jenkins
+provider: jenkins
+name: CloudCrawl Jenkins Pipeline
+description: Jenkins pipeline for building, testing, and deploying CloudCrawl
+
+stages:
+  - name: checkout
+    description: Checkout code
+    steps:
+      - checkout scm
+
+  - name: build
+    description: Build the application
+    steps:
+      - sh 'npm ci'
+      - sh 'npm run build'
+
+  - name: test
+    description: Run tests
+    steps:
+      - sh 'npm test'
+      - sh 'npm run test:integration'
+
+  - name: deploy
+    description: Deploy to environment
+    steps:
+      - sh 'helm upgrade --install cloudcrawl ./charts/cloudcrawl --namespace ${NAMESPACE} --set image.tag=${VERSION}'

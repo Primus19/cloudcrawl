@@ -1,0 +1,43 @@
+OpenAI API key not found. Using mock data for development.
+OpenAI API key not found. Using mock data for development.
+Failed to initialize Fernet cipher: Fernet key must be 32 url-safe base64-encoded bytes.
+No GCP credentials provided, using application default credentials
+Error creating manifest api-deployment: Manifest api-deployment already exists
+Error creating manifest ui-deployment: Manifest ui-deployment already exists
+Error creating manifest api-service: Manifest api-service already exists
+Error creating manifest ui-service: Manifest ui-service already exists
+Error creating manifest ingress: Manifest ingress already exists
+Error creating manifest secrets: Manifest secrets already exists
+Error creating pipeline github-actions: Pipeline github-actions already exists
+Error creating pipeline gitlab-ci: Pipeline gitlab-ci already exists
+Error creating pipeline jenkins: Pipeline jenkins already exists
+ * Serving Flask app 'app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/fixed_codebase/test_app/cloudcrawl/src/api/app.py", line 89, in <module>
+    app.run(host='0.0.0.0', port=port, debug=False)
+  File "/usr/local/lib/python3.11/dist-packages/flask/app.py", line 920, in run
+    run_simple(t.cast(str, host), port, self, **options)
+  File "/usr/local/lib/python3.11/dist-packages/werkzeug/serving.py", line 1017, in run_simple
+    inner()
+  File "/usr/local/lib/python3.11/dist-packages/werkzeug/serving.py", line 957, in inner
+    srv = make_server(
+          ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/werkzeug/serving.py", line 789, in make_server
+    return ThreadedWSGIServer(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/werkzeug/serving.py", line 693, in __init__
+    super().__init__(server_address, handler)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/usr/lib/python3.11/http/server.py", line 135, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/usr/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use

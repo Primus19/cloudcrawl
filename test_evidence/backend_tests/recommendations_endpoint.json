@@ -1,0 +1,26 @@
+{
+  "recommendations": [
+    {
+      "account_id": "aws-account-1",
+      "currency": "USD",
+      "description": "Downsize EC2 instance from t3.large to t3.medium",
+      "estimated_savings": 45.6,
+      "id": "rec-001",
+      "resource_id": "i-1234567890abcdef0",
+      "risk_level": "low",
+      "status": "pending",
+      "type": "rightsizing"
+    },
+    {
+      "account_id": "aws-account-1",
+      "currency": "USD",
+      "description": "Delete unused EBS volume",
+      "estimated_savings": 20.3,
+      "id": "rec-002",
+      "resource_id": "vol-1234567890abcdef0",
+      "risk_level": "medium",
+      "status": "pending",
+      "type": "unused_resource"
+    }
+  ]
+}

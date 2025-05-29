@@ -1,0 +1,126 @@
+# Default values for CloudCrawl Helm chart
+# This is a YAML-formatted file.
+
+replicaCount:
+  api: 2
+  ui: 2
+
+image:
+  repository:
+    api: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend
+    ui: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-frontend
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  api:
+    type: ClusterIP
+    port: 5000
+  ui:
+    type: ClusterIP
+    port: 80
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: cloudcrawl.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service: api
+            port: 5000
+        - path: /
+          pathType: Prefix
+          backend:
+            service: ui
+            port: 80
+  tls:
+    - secretName: cloudcrawl-tls
+      hosts:
+        - cloudcrawl.example.com
+
+resources:
+  api:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  ui:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  api:
+    - name: PORT
+      value: "5000"
+    - name: JWT_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: cloudcrawl-secrets
+          key: jwt-secret
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: cloudcrawl-secrets
+          key: database-url
+    - name: OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: cloudcrawl-secrets
+          key: openai-api-key
+  ui:
+    - name: API_URL
+      value: "http://cloudcrawl-api:5000"
+
+secrets:
+  create: true
+  data:
+    jwt-secret: c2VjcmV0LWtleS1mb3ItZGV2ZWxvcG1lbnQ=  # base64 encoded "secret-key-for-development"
+    database-url: cG9zdGdyZXNxbDovL3Bvc3RncmVzOnBvc3RncmVzQHBvc3RncmVzOjU0MzIvY2xvdWRjcmF3bA==  # postgresql://postgres:postgres@postgres:5432/cloudcrawl
+    openai-api-key: eW91ci1vcGVuYWktYXBpLWtleS1oZXJl  # your-openai-api-key-here

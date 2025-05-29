@@ -43,7 +43,7 @@ spec:
               key: postgres_password
       containers:
       - name: backend
-        image: ${BACKEND_IMAGE}
+        image: 637423222780.dkr.ecr.us-east-1.amazonaws.com/cloud-cost-optimizer-backend
         ports:
         - containerPort: 5000
         env:
